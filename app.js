@@ -6,6 +6,7 @@ const helmet = require('helmet');
 const mongoSanitize = require('express-mongo-sanitize');
 const xss = require('xss-clean');
 const hpp = require('hpp');
+const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const compression = require('compression');
 const cors = require('cors');
@@ -17,6 +18,7 @@ const userRouter = require('./routes/userRoutes.js');
 const reviewRouter = require('./routes/reviewRoutes.js');
 const viewRouter = require('./routes/viewRoutes.js');
 const bookingRouter = require('./routes/bookingRoutes.js');
+const bookingController = require('./controllers/bookingController.js');
 
 // Start exprss app
 const app = express();
@@ -76,6 +78,12 @@ const limiter = rateLimit({
 });
 
 app.use('/api', limiter);
+
+app.post(
+  '/webhook-checkout',
+  bodyParser.raw({ type: 'application/json' }),
+  bookingController.webhookCheckout
+);
 
 // Body parser, reading data from body to req.body
 app.use(express.json({ limt: '10kb' }));
